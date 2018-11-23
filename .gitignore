@@ -10,3 +10,6 @@
 
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
+
+SQLiteStudio-3.2.1.zip
+SQLiteStudio-3.2.1
