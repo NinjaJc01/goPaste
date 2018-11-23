@@ -24,7 +24,7 @@ class pasteClientside {
 }
 
 function onload() {
-    mDiv.textContent = "Hello there, js says hi innit";
+    mDiv.textContent = "test";
 }
 
 
@@ -37,4 +37,17 @@ async function getPaste(id) {
         paste.content,
         paste.timestamp);
     mDiv.appendChild(thisPaste.createElem());
+}
+
+async function getPastes() {
+    let pastes = await fetch("/api/paste/list")
+        .then(response => response.json());
+    console.log(pastes);
+    // pastes.array.forEach(element => {
+    //     let thisPaste = new pasteClientside(
+    //         element.id,
+    //         element.content,
+    //         element.timestamp);
+    //     mDiv.appendChild(thisPaste.createElem());
+    // });
 }

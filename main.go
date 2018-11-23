@@ -3,10 +3,9 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
-	"os"
-	"strings"
-
+	"flag"
 	"github.com/gorilla/mux"
 )
 
@@ -16,44 +15,13 @@ type Paste struct {
 	Content   string `json:"content"`
 }
 
-// func basicHandler(w http.ResponseWriter, r *http.Request) {
-// 	w.Header().Set("Content-Type", "text/plain")
+var (
+	pastesSlice []Paste
+)
 
-// 	path := r.URL.Path
-// 	method := r.Method
-// 	query := r.URL.Query()
-
-// 	fmt.Fprintf(w, "Path: %s\nMethod: %s\nQuery: %s", path, method, query)
-// }
-// func clientHandler(w http.ResponseWriter, r *http.Request) {
-// 	file := "client/" + mux.Vars(r)["file"]
-// 	fmt.Println(file)
-// 	http.ServeFile(w, r, file)
-// }
-func staticContent(w http.ResponseWriter, r *http.Request) {
-	fmt.Println(r.URL.Path)
-	filePath := "./resources" + r.URL.Path
-
-	if strings.HasSuffix(filePath, "/") {
-		filePath = filePath + "index.html"
-	}
-
-	info, err := os.Stat(filePath)
-	if os.IsNotExist(err) || info.IsDir() {
-		if !strings.HasSuffix(filePath, ".map") {
-			fmt.Println("ERROR: File not found", filePath)
-		}
-		w.WriteHeader(http.StatusNotFound)
-		return
-	}
-
-	fmt.Println("Serving file", filePath)
-	http.ServeFile(w, r, filePath)
-
-}
 func listPastes(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/plain")
-	fmt.Fprint(w, "Hello")
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(pastesSlice)
 }
 
 func getPaste(w http.ResponseWriter, r *http.Request) {
@@ -63,20 +31,51 @@ func getPaste(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(p)
 }
+func createPaste(w http.ResponseWriter, r *http.Request) {
+	//timestamp := "help"
+	// Read body
+	b, err := ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+
+	// Unmarshal
+	var msg Paste
+	err = json.Unmarshal(b, &msg)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+	
+	pastesSlice = append(pastesSlice, msg)
+	fmt.Println(msg)
+	output, err := json.Marshal(msg)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+	fmt.Println(string(output[:]))
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(output)
+}
 
 func main() {
+	portPtr := flag.Int("p", 8081, "Port number to run the server on")
+	flag.Parse()
+	port := *portPtr
 	mr := mux.NewRouter()
 	apiRouter := mr.PathPrefix("/api").Subrouter()
 	//Setup a static router for HTML/CSS/JS
-	//mr.HandleFunc("/client/", staticContent) //fix for security/directory traversal
-	mr.PathPrefix("/client/").Handler(http.StripPrefix("/client/", http.FileServer(http.Dir("./resources"))))
+	mr.PathPrefix("/client/").Handler(http.StripPrefix("/client/", http.FileServer(http.Dir("./resources")))) //test for directory traversal!
 	//CRUD API routes for pastes
 	pasteRouter := apiRouter.PathPrefix("/paste").Subrouter()
-	/*C - make one*/ pasteRouter.HandleFunc("/new", listPastes).Methods("POST")
+	/*C - make one*/ pasteRouter.HandleFunc("/new", createPaste).Methods("POST")
 	/*R - read all*/ pasteRouter.HandleFunc("/list", listPastes).Methods("GET")
 	/*R - read one*/ pasteRouter.HandleFunc("/{id}", getPaste).Methods("GET")
 	/*U - change 1*/ pasteRouter.HandleFunc("/update", listPastes).Methods("POST")
 	/*D - remove 1*/ pasteRouter.HandleFunc("/del", listPastes).Methods("POST")
 	fmt.Println("Listening for requests")
-	http.ListenAndServe(":8081", mr)
+	http.ListenAndServe(fmt.Sprintf(":%v",port), mr)
 }
