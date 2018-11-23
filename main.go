@@ -72,15 +72,11 @@ func main() {
 	mr.PathPrefix("/client/").Handler(http.StripPrefix("/client/", http.FileServer(http.Dir("./resources"))))
 	//CRUD API routes for pastes
 	pasteRouter := apiRouter.PathPrefix("/paste").Subrouter()
-	/*C*/ pasteRouter.HandleFunc("/new", listPastes).Methods("POST")
-	/*R*/ pasteRouter.HandleFunc("/list", listPastes).Methods("GET")
-	/*R*/ pasteRouter.HandleFunc("/{id}", getPaste).Methods("GET")
-	/*U*/
-	pasteRouter.HandleFunc("/update", listPastes).Methods("POST")
-	/*D*/ pasteRouter.HandleFunc("/del", listPastes).Methods("POST")
-	//CRUD API for users
-
-	//http.HandleFunc("/", basicHandler)
+	/*C - make one*/ pasteRouter.HandleFunc("/new", listPastes).Methods("POST")
+	/*R - read all*/ pasteRouter.HandleFunc("/list", listPastes).Methods("GET")
+	/*R - read one*/ pasteRouter.HandleFunc("/{id}", getPaste).Methods("GET")
+	/*U - change 1*/ pasteRouter.HandleFunc("/update", listPastes).Methods("POST")
+	/*D - remove 1*/ pasteRouter.HandleFunc("/del", listPastes).Methods("POST")
 	fmt.Println("Listening for requests")
-	http.ListenAndServe(":8081", mr) // nil would also use default
+	http.ListenAndServe(":8081", mr)
 }
