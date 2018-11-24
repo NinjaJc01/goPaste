@@ -25,7 +25,7 @@ class pasteClientside {
 }
 
 function onload() {
-    mDiv.textContent = "test";
+    getPastes
 }
 
 
@@ -54,5 +54,8 @@ async function getPastes() {
                 element.timestamp);
             mDiv.appendChild(thisPaste.createElem());
         });
-    } else console.log("null");
+    } else {
+        console.log("null");
+        mDiv.textContent = "No pastes yet! Check back soon."
+    }
 }

@@ -27,9 +27,17 @@ func listPastes(w http.ResponseWriter, r *http.Request) {
 func getPaste(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
 	fmt.Println(id)
-	p := Paste{"1", "yesterday", "lalalala"}
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(p)
+	found := false
+	for _, element := range pastesSlice {
+		if element.ID == id {
+			found = true
+			w.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(w).Encode(element)
+			break
+		}
+	}
+	if !found {w.WriteHeader(http.StatusNotFound)}
+	
 }
 func createPaste(w http.ResponseWriter, r *http.Request) {
 	//timestamp := "help"
