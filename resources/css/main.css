@@ -1,4 +1,10 @@
 div {
     background-color: crimson;
     color: chartreuse;
+    white-space: pre-wrap; /*Allows you to preserve \n and \t etc*/
 }
+/* .content {
+    background-color: darkslategrey;
+    color: white;
+    font-family: "Helvetica New", Helvetica, Arial, sans-serif;
+} */

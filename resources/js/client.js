@@ -16,7 +16,8 @@ class pasteClientside {
 
         timeDiv.textContent = this.timestamp;
         contentDiv.textContent = this.content;
-
+        contentDiv.classList.add("bg-dark");
+        contentDiv.classList.add("text-light");
         node.appendChild(timeDiv);
         node.appendChild(contentDiv);
         return node;
@@ -40,14 +41,18 @@ async function getPaste(id) {
 }
 
 async function getPastes() {
-    let pastes = await fetch("/api/paste/list")
-        .then(response => response.json());
-    console.log(pastes);
-    // pastes.array.forEach(element => {
-    //     let thisPaste = new pasteClientside(
-    //         element.id,
-    //         element.content,
-    //         element.timestamp);
-    //     mDiv.appendChild(thisPaste.createElem());
-    // });
+    // let pastes = await fetch("/api/paste/list")
+    //     .then(response => response.json());
+    const response = await fetch('/api/paste/list');
+    const pastes = await response.json();
+    if (pastes !== null) {
+        console.log(pastes);
+        pastes.forEach(element => {
+            let thisPaste = new pasteClientside(
+                element.id,
+                element.content,
+                element.timestamp);
+            mDiv.appendChild(thisPaste.createElem());
+        });
+    } else console.log("null");
 }

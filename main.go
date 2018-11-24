@@ -8,7 +8,7 @@ import (
 	"flag"
 	"github.com/gorilla/mux"
 )
-
+//Paste struct as a model for a Paste, reflected in the JSON for the struct
 type Paste struct {
 	ID        string `json:"id"`
 	Timestamp string `json:"timestamp"`
