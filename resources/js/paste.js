@@ -7,7 +7,7 @@ class pasteClientside {
         this.timestamp = timestamp;
         this.content = content;
     }
-    
+
     createElem() {
         let node = document.createElement("div");
         let timeDiv = document.createElement("div");
@@ -37,20 +37,28 @@ function onload() {
 
 
 async function getPaste(id) {
-    let paste = await fetch("/api/paste/" + id)
-        .then(response => response.json());
-    console.log(paste);
-    let thisPaste = new pasteClientside(
-        paste.id,
-        paste.content,
-        paste.timestamp);
-    mDiv.appendChild(thisPaste.createElem());
+    const response = await fetch("/api/paste/" + id);
+    if (response.ok) {
+        const paste = await response.json();
+        console.log(paste);
+        let thisPaste = new pasteClientside(
+            paste.id,
+            paste.content,
+            paste.timestamp);
+        mDiv.appendChild(thisPaste.createElem());
+    } else {
+        if (response.status == 404) {
+            window.location.replace("/client/404"); //Not so good, breaks browser history
+        }
+        console.log(response);
+    }
 }
 
 async function getPastes() {
     // let pastes = await fetch("/api/paste/list")
     //     .then(response => response.json());
     const response = await fetch('/api/paste/list');
+    console.log(response);
     const pastes = await response.json();
     if (pastes !== null) {
         console.log(pastes);
