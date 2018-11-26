@@ -7,12 +7,12 @@ class pasteClientside {
         this.timestamp = timestamp;
         this.content = content;
     }
-
     createElem() {
         let node = document.createElement("div");
         let timeDiv = document.createElement("div");
-        let contentDiv = document.createElement("div");
-
+        let contentDiv = document.createElement("code");
+        let pre = document.createElement("pre");
+        pre.appendChild(contentDiv);
         node.id = "paste" + this.id;
         timeDiv.id = "timeDiv" + this.id;
         contentDiv.id = "contentDiv" + this.id;
@@ -23,7 +23,7 @@ class pasteClientside {
         contentDiv.classList.add("text-light");
 
         node.appendChild(timeDiv);
-        node.appendChild(contentDiv);
+        node.appendChild(pre);
         return node;
     }
 }
